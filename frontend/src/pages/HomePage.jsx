@@ -2,8 +2,11 @@ import React from "react";
 import { Col, Row } from "react-bootstrap";
 import { products } from "../products";
 import Product from "../components/Product";
+import { useGetProductsQuery } from "../slices/productApiSlice";
 
 const HomePage = () => {
+  const {data} = useGetProductsQuery();
+  console.log(data)
   return (
     <>
       <h2>Latest Products</h2>
