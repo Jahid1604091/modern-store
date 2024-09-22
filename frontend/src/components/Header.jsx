@@ -1,7 +1,9 @@
 import React from "react";
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { Badge, Container, Nav, Navbar } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import { useSelector } from "react-redux";
 const Header = () => {
+  const { cartItems } = useSelector((state) => state.cart);
   return (
     <header>
       <Navbar bg="dark" variant="dark" expand="md" collapseOnSelect>
@@ -13,7 +15,9 @@ const Header = () => {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
               <LinkContainer to="/cart">
-                <Nav.Link> Cart </Nav.Link>
+              <Nav.Link>
+                  Cart {cartItems.length > 0 && <Badge bg="light" text="dark">{cartItems.length}</Badge>}
+                </Nav.Link>
               </LinkContainer>
               <LinkContainer to="/login">
                 <Nav.Link> Login </Nav.Link>

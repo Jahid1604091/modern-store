@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Container,
@@ -10,11 +10,15 @@ import {
   Button,
   Spinner,
   Alert,
+  Form,
 } from "react-bootstrap";
 import { useGetProductQuery } from "../slices/productApiSlice";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../slices/cartSlice";
 
 const ProductDetailsPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { id } = useParams();
   const {
     data: product,
@@ -23,6 +27,27 @@ const ProductDetailsPage = () => {
     isFetching,
     isSuccess,
   } = useGetProductQuery(id);
+
+  const [qty, setQty] = useState(1);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const incrementQty = () => {
+    if (qty < product.countInStock) {
+      setQty((prevQty) => prevQty + 1);
+    }
+  };
+
+  const decrementQty = () => {
+    if (qty > 1) {
+      setQty((prevQty) => prevQty - 1);
+    }
+  };
+
+  const handleAddToCart = () => {
+    dispatch(addToCart({ ...product, qty }));
+    setSuccessMessage("Product added to cart!");
+    setTimeout(() => setSuccessMessage(""), 3000);
+  };
 
   return (
     <Container className="py-4">
@@ -65,7 +90,7 @@ const ProductDetailsPage = () => {
                 style={{ maxHeight: "400px", objectFit: "cover" }}
               />
             </Col>
-            
+
             {/* Product Details */}
             <Col md={3}>
               <ListGroup variant="flush" className="shadow-sm rounded-3">
@@ -86,9 +111,13 @@ const ProductDetailsPage = () => {
                 </ListGroup.Item>
               </ListGroup>
             </Col>
-            
             {/* Add to Cart Section */}
             <Col md={3}>
+              {successMessage && (
+                <Alert variant="success" className="text-center">
+                  {successMessage}
+                </Alert>
+              )}
               <Card className="shadow-sm rounded-3">
                 <ListGroup variant="flush">
                   <ListGroup.Item className="py-3">
@@ -107,19 +136,53 @@ const ProductDetailsPage = () => {
                       </Col>
                     </Row>
                   </ListGroup.Item>
-                  <ListGroup.Item className="py-3 d-grid">
-                    <Button
-                      className="btn-block"
-                      type="button"
-                      disabled={product.countInStock === 0}
-                    >
-                      Add to Cart
-                    </Button>
-                  </ListGroup.Item>
+
+                  {product.countInStock > 0 && (
+                    <>
+                      <ListGroup.Item className="py-3 d-grid">
+                        <Row>
+                          <Col>qty:</Col>
+                          <Col className="d-flex align-items-center">
+                            <Button
+                              variant="outline-secondary"
+                              onClick={decrementQty}
+                              disabled={qty <= 1}
+                            >
+                              -
+                            </Button>
+                            <Form.Control
+                              type="number"
+                              value={qty}
+                              readOnly
+                              className="text-center mx-2"
+                              style={{ width: "50px" }}
+                            />
+                            <Button
+                              variant="outline-secondary"
+                              onClick={incrementQty}
+                              disabled={qty >= product.countInStock}
+                            >
+                              +
+                            </Button>
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+
+                      <ListGroup.Item className="py-3 d-grid">
+                        <Button
+                          onClick={handleAddToCart}
+                          className="btn-block"
+                          type="submit"
+                          disabled={product.countInStock === 0}
+                        >
+                          Add to Cart
+                        </Button>
+                      </ListGroup.Item>
+                    </>
+                  )}
                 </ListGroup>
               </Card>
             </Col>
-            
           </Row>
         </>
       )}
