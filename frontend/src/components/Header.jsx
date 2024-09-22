@@ -1,9 +1,22 @@
 import React from "react";
 import { Badge, Container, Nav, Navbar } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../slices/authSlice";
+import { useNavigate } from "react-router-dom";
+
 const Header = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { cartItems } = useSelector((state) => state.cart);
+  const { userInfo } = useSelector((state) => state.auth);
+
+  console.log(userInfo)
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
+
   return (
     <header>
       <Navbar bg="dark" variant="dark" expand="md" collapseOnSelect>
@@ -15,13 +28,19 @@ const Header = () => {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
               <LinkContainer to="/cart">
-              <Nav.Link>
+                <Nav.Link>
                   Cart {cartItems.length > 0 && <Badge bg="light" text="dark">{cartItems.length}</Badge>}
                 </Nav.Link>
               </LinkContainer>
-              <LinkContainer to="/login">
-                <Nav.Link> Login </Nav.Link>
-              </LinkContainer>
+              {userInfo?.token ? (
+                <Nav.Link onClick={handleLogout} style={{ cursor: 'pointer' }}>
+                  Logout
+                </Nav.Link>
+              ) : (
+                <LinkContainer to="/login">
+                  <Nav.Link>Login</Nav.Link>
+                </LinkContainer>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
