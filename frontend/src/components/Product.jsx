@@ -4,18 +4,25 @@ import { Link } from "react-router-dom";
 
 const Product = ({ product }) => {
   return (
-    <Card className="m-2 p-2 ">
+    <Card className="h-100">
       <Link to={`/products/${product._id}`}>
-        <Card.Img src={Product.image} variant="top" />
+        <Card.Img
+          src={product.image}
+          variant="top"
+          className="p-3"
+          style={{ height: "200px", objectFit: "contain" }}
+        />
       </Link>
-      <Card.Body>
-        <Link to={`/products/${product._id}`}>
-          <Card.Title as="div">
-            <strong>{product.name}</strong>
+
+      <Card.Body className="d-flex flex-column">
+        <Link to={`/products/${product._id}`} className="text-decoration-none">
+          <Card.Title as="h5" className="text-dark">
+            {product.name}
           </Card.Title>
         </Link>
-
-        <Card.Text as="h3">{product.price} BDT</Card.Text>
+        <Card.Text as="div" className="mt-auto">
+          <strong>${product.price}</strong>
+        </Card.Text>
       </Card.Body>
     </Card>
   );

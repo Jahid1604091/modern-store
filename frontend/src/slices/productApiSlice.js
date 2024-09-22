@@ -10,9 +10,17 @@ export const productApiSlice = apiSlice.injectEndpoints({
             keepUnusedDataFor:5, //data will be cached for 5 seconds after it’s no longer in use.
             transformResponse: res=>res.data
         }),
+
+        getProduct: builder.query({
+            query: (id) => `${BASE_URL}/api/products/${id}`,
+            providesTags: ['Product'],
+            keepUnusedDataFor:5, //data will be cached for 5 seconds after it’s no longer in use.
+            transformResponse: res=>res.data
+        }),
     })
 });
 
 export const {
     useGetProductsQuery,
+    useGetProductQuery,
 } = productApiSlice;
