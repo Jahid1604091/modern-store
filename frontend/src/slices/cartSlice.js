@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = localStorage.getItem('cart')
   ? JSON.parse(localStorage.getItem('cart'))
-  : { cartItems: [], taxPrice: 0, shippingPrice: 0, itemsPrice: 0, totalPrice: 0 };
+  : { cartItems: [], taxPrice: 0, shippingPrice: 0, itemsPrice: 0, totalPrice: 0, shippingAddress: {}, paymentMethod: 'paypal' };
 
 const cartSlice = createSlice({
   name: "cart",
@@ -13,7 +13,7 @@ const cartSlice = createSlice({
       const existingItem = state.cartItems.find(c => c._id === item._id);
 
       if (existingItem) {
-        state.cartItems = state.cartItems.map(c => 
+        state.cartItems = state.cartItems.map(c =>
           c._id === existingItem._id ? { ...c, qty: item.qty } : c
         );
       } else {
@@ -60,6 +60,14 @@ const cartSlice = createSlice({
       // Clear cart from local storage
       localStorage.removeItem('cart');
     },
+    saveShippingAddress: (state, action) => {
+      state.shippingAddress = action.payload;
+      localStorage.setItem('cart', JSON.stringify(state));
+    },
+    savePaymentMethod: (state, action) => {
+      state.paymentMethod = action.payload;
+      localStorage.setItem('cart', JSON.stringify(state));
+    },
   }
 });
 
@@ -67,10 +75,10 @@ const cartSlice = createSlice({
 const calculatePrices = (state) => {
   state.itemsPrice = state.cartItems.reduce((acc, item) => acc + Number(item.price) * Number(item.qty), 0);
   state.totalPrice = Number(state.itemsPrice) + Number(state.shippingPrice) + Number(state.taxPrice);
-  
+
   // Save updated cart to local storage
   localStorage.setItem('cart', JSON.stringify(state));
 };
 
-export const { addToCart, removeFromCart, incrementQuantity, decrementQuantity, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, incrementQuantity, decrementQuantity, clearCart, saveShippingAddress, savePaymentMethod } = cartSlice.actions;
 export default cartSlice.reducer;

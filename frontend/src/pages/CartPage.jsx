@@ -7,9 +7,11 @@ import {
   decrementQuantity,
 } from "../slices/cartSlice"; // Adjust the import according to your cart slice file
 import { AiOutlineMinus, AiOutlinePlus, AiOutlineDelete } from "react-icons/ai"; // Import icons
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { cartItems, totalPrice } = useSelector((state) => state.cart);
   const [alert, setAlert] = useState(false);
 
@@ -96,7 +98,7 @@ const CartPage = () => {
           <Row>
             <Col className="text-end">
               <h4>Total Price: ${totalPrice.toFixed(2)}</h4>
-              <Button variant="success" className="mt-3">
+              <Button onClick={()=>navigate('/shipping')} variant="success" className="mt-3">
                 Proceed to Checkout
               </Button>
             </Col>

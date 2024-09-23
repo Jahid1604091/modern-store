@@ -11,7 +11,6 @@ const Header = () => {
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
 
-  console.log(userInfo)
   const handleLogout = () => {
     dispatch(logout());
     navigate('/login');
