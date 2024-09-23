@@ -20,10 +20,18 @@ export const userApiSlice = apiSlice.injectEndpoints({
             })
         }),
 
+        getProfile: builder.query({
+            query: () => `${BASE_URL}/api/users/profile`,
+            providesTags: ['User'],
+            keepUnusedDataFor:5, 
+            transformResponse: res=>res.data
+        }),
+        
     })
 });
 
 export const {
     useRegisterMutation,
     useLoginMutation,
+    useGetProfileQuery,
 } = userApiSlice;

@@ -11,21 +11,27 @@ export const orderApiSlice = apiSlice.injectEndpoints({
                 body: {...data}
             })
         }),
-
+        
         getMyOrders: builder.query({
             query: () => `${BASE_URL}/api/orders/myorders`,
             providesTags: ['Order'],
             keepUnusedDataFor:5,
             transformResponse: res=>res.data
         }),
-
+        
         getMyOrder: builder.query({
             query: (id) => `${BASE_URL}/api/orders/myorders/${id}`,
             providesTags: ['Order'],
             keepUnusedDataFor:5,
             transformResponse: res=>res.data
         }),
-
+        
+        payOrder: builder.mutation({
+            query: (id) => ({
+                url: `${BASE_URL}/api/orders/myorders/${id}/pay`,
+                method: "PUT",
+            })
+        }),
 
     })
 });
@@ -34,5 +40,6 @@ export const {
     useCreateOrderMutation,
     useGetMyOrdersQuery,
     useGetMyOrderQuery,
-    
+    usePayOrderMutation,
+
 } = orderApiSlice;

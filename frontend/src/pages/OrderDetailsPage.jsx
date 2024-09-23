@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -10,16 +10,21 @@ import {
   Alert,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { TiTick } from "react-icons/ti";
 import { FaTimesCircle } from "react-icons/fa";
-import { useGetMyOrderQuery } from "../slices/orderApliSlice";
+import {
+  useGetMyOrderQuery,
+  usePayOrderMutation,
+} from "../slices/orderApliSlice";
 import Loader from "../components/Loader";
+import axios from "axios";
 
 export default function OrderDetailsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
+  const { search } = useLocation();
   const {
     data: order,
     isLoading,
@@ -28,7 +33,22 @@ export default function OrderDetailsPage() {
     error,
   } = useGetMyOrderQuery(id);
   const { userInfo } = useSelector((state) => state.auth);
+  const [payOrder] = usePayOrderMutation();
+  const [isValidated, setIsValidated] = useState(false);
 
+  const changeOrderToPaid = async () => {
+    const res = await payOrder(id).unwrap();
+    if (res.success) {
+      alert("Order Is paid !");
+      return
+    }
+  };
+  useEffect(() => {
+    if (search.split("=")[1] === "VALID") {
+      setIsValidated(true);
+      changeOrderToPaid();
+    }
+  }, [isValidated, search, id]);
   const paymentHandler = async () => {
     try {
       const config = {
@@ -44,7 +64,7 @@ export default function OrderDetailsPage() {
       };
       const {
         data: { data },
-      } = await axios.post("/api/payment/ssl-request", payment_data, config);
+      } = await axios.post("/api/payments/ssl-request", payment_data, config);
       window.location.replace(data?.GatewayPageURL);
     } catch (error) {
       console.error("Payment Error:", error);
@@ -85,14 +105,10 @@ export default function OrderDetailsPage() {
                 </span>
               </p>
               <p>
-                Name:{" "}
-                <span className="fw-lighter">{order.user.name}</span>
+                Name: <span className="fw-lighter">{order.user.name}</span>
               </p>
               <p>
-                Email:{" "}
-                <span className="fw-lighter ">
-                  {order.user.email}
-                </span>
+                Email: <span className="fw-lighter ">{order.user.email}</span>
               </p>
               <h5 className="fw-bold text-uppercase">Your Order Status</h5>
               {order.isPaid ? (
