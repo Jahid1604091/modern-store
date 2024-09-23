@@ -8,9 +8,10 @@ const protect = asyncHandler(async(req,res,next)=>{
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
         token = req.headers.authorization.split(' ')[1];
     }
-    else if(req.cookies.token){
-        token = req.cookies.token
-    }
+    // else if(req.cookies.token){
+    //     token = req.cookies.token
+    // }
+
     if(!token){
         return next(new ErrorResponse('Unauthorized user',401));
     }
@@ -18,6 +19,7 @@ const protect = asyncHandler(async(req,res,next)=>{
     try {
         //verify token
         const decoded = jwt.verify(token,process.env.JWT_SECRET);
+        console.log(`Decoded ${decoded}`)
         req.user = await User.findById(decoded.id);
         next();
     } catch (error) {
@@ -39,7 +41,7 @@ const authorize = (...roles) =>{
     }
 }
 
-export default {
+export  {
     protect,
     authorize
 }
