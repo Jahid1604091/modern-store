@@ -9,29 +9,41 @@ import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import path from 'path';
 
-const __dirname = path.resolve() 
+const __dirname = path.resolve()
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 const app = express();
 connectDB();
 app.use(cors({
-    // credentials: true,
-    origin: [process.env.DEV_DOMAIN],
-    // origin: "*",
-    methods: ['GET','POST','PUT','PATCH','DELETE'],
-    allowedHeaders: ['Content-Type',],
-  }));
+  // credentials: true,
+  origin: [process.env.DEV_DOMAIN],
+  // origin: "*",
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type',],
+}));
 
-app.get('', (req, res) => {
-    res.send('Server is up...')
-});
+
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use('/invoices', express.static(path.join(__dirname, './invoices')));
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+
+if (process.env.NODE_ENV === 'prod') {
+  app.use(express.static(path.join(__dirname, '../frontend/build'))); // Adjust path here
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html')); // Adjust path here
+  });
+}
+
+else {
+  app.get('', (req, res) => {
+    res.send('Server is up...')
+  });
+}
+
 
 app.use(notFound);
 app.use(errHandler);
