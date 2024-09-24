@@ -1,7 +1,9 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/orderModel.js";
-
-
+import Product from "../models/productModel.js";
+import path from 'path';
+import { invoiceGenerate } from "../utils/invoiceGenerate.js";
+import fs from 'fs';
 
 //@route    /api/orders/
 //@desc     post create a new order
@@ -44,6 +46,16 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id);
     order.isPaid = true;
     order.paidAt = Date.now();
+
+    //increment the sales count in product table
+    for (const item of order.orderItems) {
+        const product = await Product.findById(item.product);
+        if (product) {
+            product.sales += item.qty;
+            await product.save();
+        }
+    }
+
     // order.paymentResult = {
     //     id:req.body.id,
     //     status:req.body.status,
@@ -70,18 +82,33 @@ export const getAllOrders = asyncHandler(async (req, res) => {
     });
 })
 
-//@route    /api/orders/:id/mark-as-delivered
-//@desc     GET     update order to delivered
-//@access   protected/Admin
-export const updateOrderToDelivered = asyncHandler(async (req, res) => {
+//@route    /api/orders/myorders/:id/invoice
+//@desc     GET     generate an invoice
+//@access   protected
+export const generateInvoice = asyncHandler(async (req, res) => {
+    const __dirname = path.resolve()
     const order = await Order.findById(req.params.id);
-    order.isDelivered = true;
-    order.deliveredAt = Date.now();
+    const invoicesDir = path.join(__dirname, 'invoices');
+    if (!fs.existsSync(invoicesDir)) {
+        fs.mkdirSync(invoicesDir, { recursive: true });
+    }
+    const invoicePath = path.join(invoicesDir, `invoice_${order._id}.pdf`);
+
+    const stream = res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment;filename=invoice.pdf`,
+    });
+
+    invoiceGenerate(order, 
+        invoicePath, 
+        (chunk) => stream.write(chunk),
+        () => stream.end()
+    );
     
-    const updatedOrder = await order.save();
+    // res.download(invoicePath);
     return res.status(200).json({
         success: true,
-        data: updatedOrder
+        data: invoicePath
     });
 })
 

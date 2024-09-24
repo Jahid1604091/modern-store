@@ -41,3 +41,17 @@ export const login = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`Invalid email or password`, 401));
     }
 });
+
+//@desc     get profile
+//@route    GET     /api/users/profile
+//@access   private
+export const getProfile = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select('+password');
+    if (!user) {
+        return next(new ErrorResponse('User not found', 404));
+    }
+    return res.status(200).json({
+        success: true,
+        data: user
+    });
+});
