@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Container,
@@ -12,9 +12,13 @@ import {
   Alert,
   Form,
 } from "react-bootstrap";
-import { useGetProductQuery } from "../slices/productApiSlice";
+import {
+  useGetProductQuery,
+  useIncrementProductViewMutation,
+} from "../slices/productApiSlice";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../slices/cartSlice";
+import { throttle } from "lodash";
 
 const ProductDetailsPage = () => {
   const navigate = useNavigate();
@@ -27,7 +31,7 @@ const ProductDetailsPage = () => {
     isFetching,
     isSuccess,
   } = useGetProductQuery(id);
-
+  const [incrementProductView] = useIncrementProductViewMutation();
   const [qty, setQty] = useState(1);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -48,6 +52,31 @@ const ProductDetailsPage = () => {
     setSuccessMessage("Product added to cart!");
     setTimeout(() => setSuccessMessage(""), 3000);
   };
+
+  // const s = useLocation();
+  const viewedProductIds =
+    JSON.parse(sessionStorage.getItem("viewedProductIds")) || [];
+
+  const incrementViewCount = useCallback(
+    throttle(async () => {
+      incrementProductView(id);
+      await viewedProductIds.push(id);
+      sessionStorage.setItem(
+        "viewedProductIds",
+        JSON.stringify(viewedProductIds)
+      );
+    }, 5000),
+    [id]
+  );
+
+  useEffect(() => {
+    if (!viewedProductIds.includes(id)) {
+      incrementViewCount();
+      return () => {
+        incrementViewCount.cancel();
+      };
+    }
+  }, [id]);
 
   return (
     <Container className="py-4">

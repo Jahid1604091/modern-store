@@ -33,6 +33,12 @@ export const orderApiSlice = apiSlice.injectEndpoints({
             })
         }),
 
+        downloadInvoice: builder.query({
+            query: (id) => `${BASE_URL}/api/orders/myorders/${id}/invoice`,
+            providesTags: ['Order'],
+            keepUnusedDataFor:5,
+        }),
+
     })
 });
 
@@ -41,5 +47,6 @@ export const {
     useGetMyOrdersQuery,
     useGetMyOrderQuery,
     usePayOrderMutation,
+    useLazyDownloadInvoiceQuery,
 
 } = orderApiSlice;

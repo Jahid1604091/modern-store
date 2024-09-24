@@ -15,10 +15,12 @@ import { TiTick } from "react-icons/ti";
 import { FaTimesCircle } from "react-icons/fa";
 import {
   useGetMyOrderQuery,
+  useLazyDownloadInvoiceQuery,
   usePayOrderMutation,
 } from "../slices/orderApliSlice";
 import Loader from "../components/Loader";
 import axios from "axios";
+import { BASE_URL } from "../utils/constants";
 
 export default function OrderDetailsPage() {
   const dispatch = useDispatch();
@@ -32,16 +34,13 @@ export default function OrderDetailsPage() {
     isSuccess,
     error,
   } = useGetMyOrderQuery(id);
+  const [triggerDownloadInvoice] = useLazyDownloadInvoiceQuery();
   const { userInfo } = useSelector((state) => state.auth);
   const [payOrder] = usePayOrderMutation();
   const [isValidated, setIsValidated] = useState(false);
 
   const changeOrderToPaid = async () => {
     const res = await payOrder(id).unwrap();
-    if (res.success) {
-      alert("Order Is paid !");
-      return
-    }
   };
   useEffect(() => {
     if (search.split("=")[1] === "VALID") {
@@ -73,6 +72,27 @@ export default function OrderDetailsPage() {
 
   const deliverHandler = () => {
     // dispatch(deliverOrder(id))
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/orders/myorders/${id}/invoice`, {
+        responseType: "blob",
+        headers:{
+          Authorization: `Bearer ${userInfo.token}`
+        }
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `invoice_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+    }
   };
 
   if (isLoading) {
@@ -196,13 +216,21 @@ export default function OrderDetailsPage() {
               </ListGroup.Item>
             </ListGroup>
             <div className="text-center mt-2">
-              {!order.isPaid && (
+              {!order.isPaid ? (
                 <Button
                   onClick={paymentHandler}
                   className="px-4 text-light text-uppercase rounded-0 shadow"
                   variant="primary"
                 >
                   Make Payment
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => handleDownload()}
+                  className="px-4 text-light text-uppercase rounded-0 shadow"
+                  variant="primary"
+                >
+                  Download Invoice
                 </Button>
               )}
               {userInfo?.data?.role === "admin" && !order.isDelivered && (

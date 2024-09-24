@@ -2,7 +2,9 @@ import React from "react";
 import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
+
 const Product = ({ product }) => {
+
   return (
     <Card className="h-100">
       <Link to={`/products/${product._id}`}>
