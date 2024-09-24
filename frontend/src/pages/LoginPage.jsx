@@ -92,9 +92,7 @@ const LoginPage = () => {
               )}
             </Form>
             <div className="d-flex justify-content-between mt-3">
-              <p>
-                Forgot Password? <Link to="/forgot-password">RESET</Link>
-              </p>
+              
               <p>
                 New Customer? <Link to="/register">Register</Link>
               </p>
