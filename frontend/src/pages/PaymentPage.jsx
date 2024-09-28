@@ -15,7 +15,7 @@ export default function PaymentPage() {
         navigate('/shipping')
     }
 
-    const [paymentMethod, setPaymentMethod] = useState('paypal')
+    const [paymentMethod, setPaymentMethod] = useState('stripe')
 
 
     const submitHandler = (e) => {
@@ -36,17 +36,17 @@ export default function PaymentPage() {
                             <Col>
                                 <Form.Check
                                     type='radio'
-                                    label='PayPal or Credit Card'
-                                    id='PayPal'
+                                    label='stripe'
+                                    id='stripe'
                                     name='paymentMethod'
-                                    value='paypal'
+                                    value='stripe'
                                     className='rounded-0 mb-2'
                                     checked
                                     onChange={e => setPaymentMethod(e.target.value)}
                                 >
 
                                 </Form.Check>
-                                <Form.Check
+                                {/* <Form.Check
                                     type='radio'
                                     label='bKash'
                                     id='bKash'
@@ -57,7 +57,7 @@ export default function PaymentPage() {
                                     onChange={e => setPaymentMethod(e.target.value)}
                                 >
 
-                                </Form.Check>
+                                </Form.Check> */}
                             </Col>
                         </Form.Group>
                         <Button type='submit' className='px-4 text-light text-uppercase rounded-0 shadow' variant='primary'>Continue</Button>

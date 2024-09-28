@@ -7,7 +7,7 @@ export default function Loader() {
             <Row>
                 <Col className='mt-5 my-5 text-center'>
                     <h2>  <Spinner animation="border" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                        {/* <span className="visually-hidden">Loading...</span> */}
                     </Spinner> Loading...</h2>
                 </Col>
             </Row>

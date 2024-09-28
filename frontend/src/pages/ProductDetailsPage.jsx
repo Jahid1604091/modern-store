@@ -19,6 +19,8 @@ import {
 import { useDispatch } from "react-redux";
 import { addToCart } from "../slices/cartSlice";
 import { throttle } from "lodash";
+import AlertDismissible from "../components/Alert";
+import Loader from "../components/Loader";
 
 const ProductDetailsPage = () => {
   const navigate = useNavigate();
@@ -82,20 +84,13 @@ const ProductDetailsPage = () => {
     <Container className="py-4">
       <h2 className="text-center mb-4">Product Details</h2>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="text-center my-5">
-          <Spinner animation="border" role="status" variant="primary">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-        </div>
-      )}
+      {isLoading && <Loader />}
 
-      {/* Error State */}
       {isError && (
-        <Alert variant="danger" className="text-center">
-          An error occurred while fetching the product. Please try again later.
-        </Alert>
+        <AlertDismissible
+          variant="danger"
+          message="An error occurred while fetching the products. Please try again later."
+        />
       )}
 
       {/* Data Display */}
@@ -214,15 +209,6 @@ const ProductDetailsPage = () => {
             </Col>
           </Row>
         </>
-      )}
-
-      {/* Fetching State */}
-      {isFetching && (
-        <div className="text-center my-3">
-          <Spinner animation="grow" role="status" variant="primary">
-            <span className="visually-hidden">Fetching Data...</span>
-          </Spinner>
-        </div>
       )}
     </Container>
   );
