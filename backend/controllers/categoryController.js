@@ -36,6 +36,34 @@ export const getCategories = asyncHandler(async (req, res, next) => {
 
 
 //@route    /api/categories/admin/:id
+//@desc     PATCH: update a category
+//@access   protected by admin
+export const editCategory = asyncHandler(async (req, res, next) => {
+    const id = req.params.id;
+    const { name } = req.body
+    if (!name) {
+        return next(new ErrorResponse('Category name is required!', 400));
+    }
+    const category = await Category.findById(id);
+
+    if (!category) {
+        return next(new ErrorResponse('No Category Found to Edit!', 404));
+    }
+
+    //update table
+    category.name = name;
+    category.slug = slugify(name, '-');
+
+    const updatedCategory = await category.save();
+
+    return res.status(200).json({
+        success: true,
+        message: "Category updated successfully!",
+        data: updatedCategory
+    });
+})
+
+//@route    /api/categories/admin/:id
 //@desc     DELETE: delete a category
 //@access   protected by admin
 export const deleteCategory = asyncHandler(async (req, res, next) => {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProduct, deleteProduct, getAllProducts, getProduct, incremeentProductView } from '../controllers/productController.js';
+import { createProduct, deleteProduct, editProduct, getAllProducts, getProduct, incremeentProductView } from '../controllers/productController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 import path from 'path';
 import multer from 'multer';
@@ -31,5 +31,6 @@ router.route('/:id/view')
 
 router.route('/admin').post(protect, authorize('admin'), upload.single('image'), createProduct);
 router.route('/admin/:id').delete(protect, authorize('admin'), deleteProduct);
+router.route('/admin/:id').patch(protect, authorize('admin'), upload.single('image'), editProduct);
 
 export default router;

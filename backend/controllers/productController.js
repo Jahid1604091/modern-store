@@ -126,6 +126,66 @@ export const createProduct = asyncHandler(async (req, res) => {
   });
 })
 
+
+//@route    /api/products/admin/:id
+//@desc     PATCH: update a new product
+//@access   protected by admin
+export const editProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    return next(new ErrorResponse('No Product Found to Update!', 404));
+  }
+  const { name, description, brand, category, price, countInStock } = req.body;
+
+  // Check if the category exists and is not soft-deleted
+  // const existingCategory = await Category.findOne({ _id: category, isSoftDeleted: false });
+  // if (!existingCategory) {
+  //   return res.status(404).json({
+  //     success: false,
+  //     message: 'Category not found or it has been soft-deleted!'
+  //   });
+  // }
+
+  // // Check if the brand exists and is not soft-deleted
+  // const existingBrand = await Brand.findOne({ _id: brand, isSoftDeleted: false });
+  // if (!existingBrand) {
+  //   return res.status(404).json({
+  //     success: false,
+  //     message: 'Brand not found or it has been soft-deleted!'
+  //   });
+  // }
+
+  product.name = name || product.name;
+  product.slug = name ?  slugify(name, '-') : product.slug;
+  product.description = description || product.description;
+  product.brand = brand || product.brand;
+  product.category = category || product.category;
+  product.price = price || product.price;
+  product.countInStock = countInStock || product.countInStock;
+
+  // Handle image upload
+  if (req.file) {
+    // Delete the old image if it exists
+    if (product.image) {
+      const __dirname = path.resolve();
+      const oldImagePath = path.join(__dirname, product.image);
+      fs.unlink(oldImagePath, (err) => {
+        if (err) console.error('Failed to delete old product image:', err);
+      });
+    }
+    product.image = req.file.path;
+  }
+
+  // Save the updated product
+  const updatedProduct = await product.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Product updated successfully!",
+    data: updatedProduct
+  });
+})
+
 //@route    /api/products/admin/:id
 //@desc     DELETE: delete a product
 //@access   protected by admin
