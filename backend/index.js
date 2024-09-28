@@ -7,6 +7,8 @@ import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import brandRoutes from './routes/brandRoutes.js';
 import path from 'path';
 
 const __dirname = path.resolve()
@@ -25,11 +27,15 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use('/invoices', express.static(path.join(__dirname, './invoices')));
+app.use('/images/*', express.static(path.join(__dirname, './images')));
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/brands', brandRoutes);
 
 if (process.env.NODE_ENV === 'prod') {
   app.use(express.static(path.join(__dirname, '../frontend/build'))); // Adjust path here

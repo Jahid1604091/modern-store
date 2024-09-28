@@ -6,6 +6,10 @@ const productSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        slug: {
+            type: String,
+            required: true,
+        },
         image: {
             type: String,
             required: true,
@@ -15,11 +19,13 @@ const productSchema = mongoose.Schema(
             required: true,
         },
         brand: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Brand",
             required: true,
         },
         category: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Category",
             required: true,
         },
         price: {
@@ -32,14 +38,25 @@ const productSchema = mongoose.Schema(
             required: true,
             default: 0,
         },
-        views:{
-            type:Number,
-            default:0,
+        views: {
+            type: Number,
+            default: 0,
         },
-        sales:{
-            type:Number,
-            default:0,
+        sales: {
+            type: Number,
+            default: 0,
         },
+        isSoftDeleted: {
+            type: Boolean,
+            default: false
+        },
+        softDeletedAt: {
+            type: Date,
+        },
+        deletedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        }
     },
     {
         timestamps: true,
