@@ -18,10 +18,10 @@ const app = express();
 connectDB();
 app.use(cors({
   // credentials: true,
-  origin: [process.env.DEV_DOMAIN],
-  // origin: "*",
+  // origin: [process.env.DEV_DOMAIN, process.env.LIVE_DOMAIN, process.env.DEV_ADMIN, process.env.LIVE_ADMIN],
+  origin: "*",
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type',],
+  allowedHeaders: ['Content-Type','*'],
 }));
 
 
